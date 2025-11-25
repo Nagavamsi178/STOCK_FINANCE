@@ -40,11 +40,16 @@ def divide_numbers(a: float, b: float) -> float:
 @app.get("/")
 async def root():
     return {
-        "message": "Simple Calculator MCP Server", 
+        "message": "Simple Calculator MCP Server",
         "version": "1.0.0",
         "endpoints": [
             "/tools",
             "/calculate",
+            "/add",
+            "/subtract",
+            "/multiply",
+            "/divide",
+            "/health",
             "/docs"
         ]
     }
@@ -52,7 +57,7 @@ async def root():
 @app.get("/tools")
 async def list_tools() -> List[ToolDefinition]:
     """List all available calculator tools"""
-    return [  
+    return [
         ToolDefinition(
             name="add",
             description="Add two numbers together",
@@ -93,43 +98,33 @@ async def calculate(request: CalculationRequest):
     try:
         if request.operation == "add":
             result = add_numbers(request.a, request.b)
-            return {
-                "operation": "add",
-                "expression": f"{request.a} + {request.b}",
-                "result": result,
-                "success": True
-            }
+
         elif request.operation == "multiply":
             result = multiply_numbers(request.a, request.b)
-            return {
-                "operation": "multiply",
-                "expression": f"{request.a} × {request.b}",
-                "result": result,
-                "success": True
-            }
+
         elif request.operation == "subtract":
             result = subtract_numbers(request.a, request.b)
-            return {
-                "operation": "subtract",
-                "expression": f"{request.a} - {request.b}",
-                "result": result,
-                "success": True
-            }
+
         elif request.operation == "divide":
             result = divide_numbers(request.a, request.b)
-            return {
-                "operation": "divide",
-                "expression": f"{request.a} ÷ {request.b}",
-                "result": result,
-                "success": True
-            }
+
         else:
             raise HTTPException(
-                status_code=400, 
-                detail=f"Unknown operation: {request.operation}. Available operations: add, multiply, subtract, divide"
+                status_code=400,
+                detail=f"Unknown operation: {request.operation}. "
+                       f"Available operations: add, multiply, subtract, divide"
             )
+
+        return {
+            "operation": request.operation,
+            "expression": f"{request.a} {request.operation} {request.b}",
+            "result": result,
+            "success": True
+        }
+
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Calculation error: {str(e)}")
 
@@ -138,30 +133,27 @@ async def health_check():
     """Health check endpoint"""
     return {"status": "healthy", "service": "calculator-api"}
 
-# Quick calculation endpoints for simple GET requests
+# Quick GET endpoints
 @app.get("/add")
 async def add_get(a: float, b: float):
-    """Add two numbers via GET request"""
     result = add_numbers(a, b)
-    return {"operation": "add", "result": result, "expression": f"{a} + {b}"}
+    return {"operation": "add", "expression": f"{a} + {b}", "result": result}
 
 @app.get("/multiply")
 async def multiply_get(a: float, b: float):
-    """Multiply two numbers via GET request"""
     result = multiply_numbers(a, b)
-    return {"operation": "multiply", "result": result, "expression": f"{a} × {b}"}
+    return {"operation": "multiply", "expression": f"{a} × {b}", "result": result}
 
 @app.get("/subtract")
 async def subtract_get(a: float, b: float):
-    """Subtract two numbers via GET request"""
     result = subtract_numbers(a, b)
-    return {"operation": "subtract", "result": result, "expression": f"{a} - {b}"}
+    return {"operation": "subtract", "expression": f"{a} - {b}", "result": result}
 
-# Run the server
+@app.get("/divide")
+async def divide_get(a: float, b: float):
+    result = divide_numbers(a, b)
+    return {"operation": "divide", "expression": f"{a} ÷ {b}", "result": result}
+
+# Run Server
 if __name__ == "__main__":
-    uvicorn.run(
-        "server:app",
-        host="127.0.0.1",
-        port=8000,
-        reload=True
-    )
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)

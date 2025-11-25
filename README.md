@@ -1,4 +1,1 @@
-"# server" 
-"# mcp" 
-"# mcp1" 
-"# mcp-server" 
+"# STOCK_FINANCE" 

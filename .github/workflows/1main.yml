@@ -1,13 +1,13 @@
-name: streamlit-ci
+name: fastapi-ci
 
 on:
   push:
     branches: ["main"]
     paths:
-      - "frontend/**"
+      - "backend/**"
 
 jobs:
-  frontend-ci:
+  backend-ci:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,10 +21,10 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd frontend
+          cd backend
           pip install -r requirements.txt
 
-      - name: Import Streamlit
+      - name: Python syntax check
         run: |
-          cd frontend
-          python -c "import streamlit"
+          cd backend
+          python -m compileall .

@@ -3,18 +3,10 @@ name: fastapi-ci
 on:
   push:
     branches: ["main"]
-    paths:
-      - "backend/**"
 
 jobs:
   backend-ci:
     runs-on: ubuntu-latest
-    
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "GitHub Actions is working"
 
     steps:
       - name: Checkout code
@@ -27,10 +19,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd backend
-          pip install -r requirements.txt
+          pip install -r backend/requirements.txt
 
       - name: Python syntax check
         run: |
-          cd backend
-          python -m compileall .
+          python -m compileall backend
